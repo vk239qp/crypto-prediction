@@ -3,11 +3,14 @@ import pandas as pd
 from pandas import DataFrame
 from sklearn.preprocessing import MinMaxScaler
 
+from src.utils.scrapper import Scrapper
 
-class Util:
+
+class DataUtil:
     data_path = "../dataset/prices.csv"
 
     def __init__(self):
+        self.scrapper = Scrapper()
         self.scaler_x = MinMaxScaler()
         self.scaler_y = MinMaxScaler()
 
@@ -22,7 +25,7 @@ class Util:
         data = data.set_index('timestamp')
         data.index = pd.to_datetime(data.index, unit='s')
 
-        data_x = data[['open', 'high', 'low', 'volumeTo', 'volumeFrom']]
+        data_x = data[['open', 'high', 'low']]
         data_y = data['close']
 
         return data_x, data_y

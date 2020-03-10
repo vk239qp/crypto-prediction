@@ -11,28 +11,25 @@ class LSTMBuilder:
 
     def __init__(self, back_step: int, future_step: int):
         self.model = None
-        self.features = 5
+        self.features = 3
         self.back_step = back_step
         self.future_step = future_step
 
     # building model
+
+    # 100,80,60,60,60,30 - dost spoko
     def build(self):
         self.model = Sequential()
-        self.model.add(
-            LSTM(100, input_shape=(self.back_step, self.features), activation="softsign", return_sequences=True))
-        self.model.add(LSTM(80, activation="softsign", return_sequences=True))
-        self.model.add(LSTM(60, activation="softsign", return_sequences=True))
-        self.model.add(Dropout(0.2))
-        self.model.add(LSTM(60, activation="softsign", return_sequences=True))
-        self.model.add(LSTM(60, activation="softsign", return_sequences=True))
-        self.model.add(Dropout(0.2))
-        self.model.add(LSTM(30, activation="softsign"))
+        self.model.add(LSTM(120, input_shape=(self.back_step, self.features), activation="relu", return_sequences=True))
+        self.model.add(LSTM(60, activation="relu", return_sequences=True))
+        self.model.add(LSTM(60, activation="relu", return_sequences=True))
+        self.model.add(LSTM(30, activation="relu"))
         self.model.add(Dense(self.future_step))
         self.model.summary()
         self.model.compile(loss='mse', optimizer='adam', metrics=['accuracy'])
 
     # training model
-    def train(self, data_x, data_y, epochs=600, batch=64, log_level=2):
+    def train(self, data_x, data_y, epochs=800, batch=64, log_level=2):
         results = self.model.fit(data_x, data_y, validation_split=0.1, epochs=epochs, batch_size=batch,
                                  verbose=log_level)
 
@@ -73,7 +70,7 @@ class LSTMBuilder:
         actual = scaler.inverse_transform(data_y[-1].reshape(-1, 1))
 
         # Printing and plotting those predictions
-        print("Predicted Prices:\n", prediction)
+        print("Predicted Prices:\n", prediction.tolist())
         plt.plot(prediction, label='Predicted')
 
         # Printing and plotting the actual values
