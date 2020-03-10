@@ -25,7 +25,7 @@ class DataUtil:
         data = data.set_index('timestamp')
         data.index = pd.to_datetime(data.index, unit='s')
 
-        data_x = data[['open', 'high', 'low']]
+        data_x = data[['open', 'high', 'low', 'volumeFrom', 'volumeTo']]
         data_y = data['close']
 
         return data_x, data_y
