@@ -16,6 +16,8 @@ class Stage(ABC):
         with open(f"../src/config/{config_file}.yml", 'r') as file:
             self.config = yaml.load(file, Loader=yaml.FullLoader)
 
+        self.pipe = None
+
     """
     This method must be implemented in concrete pipeline component. It defines component's logic.
     """
@@ -25,8 +27,22 @@ class Stage(ABC):
         pass
 
     """
-    This method gathers all component's attributes.
+    Obtaining access to pipe and all attributes pushed to the flow.
     """
 
-    def get_attributes(self):
+    def attach(self, pipe):
+        self.pipe = pipe
+
+    """
+    This method pushes component's attributes to the flow.
+    """
+
+    def push_attributes(self):
         return vars(self)
+
+    """
+    This method gets attribute from the flow.
+    """
+
+    def get_attributes(self, property_name: str):
+        return self.pipe.properties[property_name]
