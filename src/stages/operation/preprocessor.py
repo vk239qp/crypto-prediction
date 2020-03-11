@@ -3,25 +3,24 @@ import pandas as pd
 from pandas import DataFrame
 from sklearn.preprocessing import MinMaxScaler
 
-from src.utils.scrapper import Scrapper
+from src.pipeline.stage import Stage
 
 
-class DataUtil:
-    data_path = "../dataset/prices.csv"
+class Preprocessor(Stage):
 
-    def __init__(self):
-        self.scrapper = Scrapper()
+    def __init__(self, config_file: str):
+        super().__init__(config_file)
         self.scaler_x = MinMaxScaler()
         self.scaler_y = MinMaxScaler()
 
+        self.recent = self.config["preprocessor"]["data"]["recent"]
+
     """
     Loading data from csv.
-    
-    recent - number of most recent data
     """
 
-    def load(self, recent: int):
-        data = pd.read_csv(self.data_path).tail(recent)
+    def load(self):
+        data = pd.read_csv(self.data_path).tail(self.recent)
         data = data.set_index('timestamp')
         data.index = pd.to_datetime(data.index, unit='s')
 
@@ -97,3 +96,6 @@ class DataUtil:
         test_y = data_y.iloc[split_row:]
 
         return train_x, train_y, test_x, test_y
+
+    def run(self):
+        pass

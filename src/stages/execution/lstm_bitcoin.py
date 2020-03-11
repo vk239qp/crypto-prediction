@@ -1,6 +1,6 @@
 from keras.layers import LSTM, Dense
 
-from src.neural_network.builder import Builder
+from src.stages.execution.builder import Builder
 
 
 class LSTMBitcoin(Builder):

@@ -1,0 +1,10 @@
+scrapper:
+  load: true
+  drop_columns:
+#    - volumeto
+#    - volumefrom
+
+cryptocompare:
+  url: https://min-api.cryptocompare.com/data/v2/histoday
+  token: 9d58fc75d1c92af7eae04ea63a60d36df49da09d6ac3818daa2e45dbe7e4426a
+  crypto: BTC
