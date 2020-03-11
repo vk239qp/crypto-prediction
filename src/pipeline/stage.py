@@ -34,11 +34,18 @@ class Stage(ABC):
         self.pipe = pipe
 
     """
-    This method pushes component's attributes to the flow.
+    This method gathers all component's attributes defined in constructor.
     """
 
-    def push_attributes(self):
+    def gather_attributes(self):
         return vars(self)
+
+    """
+    This method adds additional component's attributes to the flow.
+    """
+
+    def add_attribute(self, att_name, att_value):
+        self.pipe.properties[att_name] = att_value
 
     """
     This method gets attribute from the flow.

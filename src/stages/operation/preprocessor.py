@@ -30,6 +30,7 @@ class Preprocessor(Stage):
 
         data_columns = list(data.columns.values)
         data_columns.remove('close')
+        self.add_attribute('features',len(data_columns))
 
         data_x = data[data_columns]
         data_y = data['close']
@@ -101,4 +102,8 @@ class Preprocessor(Stage):
         return train_x, train_y, test_x, test_y
 
     def run(self):
-        self.prepare()
+        train_x, train_y, test_x, test_y = self.prepare()
+        self.add_attribute('train_x', train_x)
+        self.add_attribute('train_y', train_y)
+        self.add_attribute('test_x', test_x)
+        self.add_attribute('test_y', test_y)

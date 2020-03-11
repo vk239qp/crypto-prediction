@@ -1,23 +1,25 @@
-import numpy as np
-from abc import ABC, abstractmethod
+from abc import abstractmethod
+from datetime import datetime
 
 from keras import Sequential
+from pandas import np
+
+from src.pipeline.stage import Stage
+from src.stages.execution.plotter import Plotter
 
 
-class Builder(ABC):
-    """
-    Default constructor for LSTM network
+class Builder(Stage):
 
-    features - Number of features in dataset
-    back_step - Number of days to be considered for prediction
-    future_step - Number of days to predict prices
-    """
+    def __init__(self, config_file: str):
+        super().__init__(config_file)
 
-    def __init__(self, features: int, back_step: int, future_step: int):
+        self.batch_size = self.config["network"]["batch"]
+        self.epochs = self.config["network"]["epochs"]
+        self.log_level = self.config["network"]["log"]
+        self.validation = self.config["network"]["validation"]
+
         self.model = Sequential()
-        self.features = features
-        self.back_step = back_step
-        self.future_step = future_step
+        self.plotter = Plotter()
 
     """
     Building model 
@@ -29,68 +31,65 @@ class Builder(ABC):
 
     """
     Training model
-    
-    data_x - Numpy array of features
-    data_y - Numpy array of targets
-    epochs - Number of training epochs
-    batch - Batch size
-    log_level - Log level
     """
 
-    # def train(self, data_x: np.array, data_y: np.array, epochs=500, batch=32, log_level=2):
-    #     results = self.model.fit(data_x, data_y, validation_split=0.1, epochs=epochs, batch_size=batch,
-    #                              verbose=log_level)
-    #
-    #     # plotting loss
-    #     history = results.history
-    #     plt.figure(figsize=(12, 4))
-    #     plt.plot(history['val_loss'])
-    #     plt.plot(history['loss'])
-    #     plt.legend(['val_loss', 'loss'])
-    #     plt.title('Loss')
-    #     plt.xlabel('Epochs')
-    #     plt.ylabel('Loss')
-    #     plt.show()
-    #
-    #     # plotting accuracy
-    #     plt.figure(figsize=(12, 4))
-    #     plt.plot(history['val_accuracy'])
-    #     plt.plot(history['accuracy'])
-    #     plt.legend(['val_accuracy', 'accuracy'])
-    #     plt.title('Accuracy')
-    #     plt.xlabel('Epochs')
-    #     plt.ylabel('Accuracy')
-    #     plt.show()
-    #
-    # """
-    # Verifying model
-    # """
-    #
-    # def verify(self, data_x: np.array, data_y: np.array, scaler: MinMaxScaler):
-    #     plt.figure(figsize=(12, 5))
-    #     # getting time to add as timestamp to graph
-    #     date_time = datetime.now()
-    #     date_time_formatted = date_time.strftime("%d/%m/%Y-%H:%M")
-    #
-    #     # Getting predictions by predicting from the last X
-    #     prediction = self.model.predict(data_x[-1].reshape(1, self.back_step, self.features)).tolist()[0]
-    #
-    #     # Transforming normalized values back to normal range
-    #     prediction = scaler.inverse_transform(np.array(prediction).reshape(-1, 1))
-    #
-    #     # Getting the actual values from the last available y variable which correspond to its respective X variable
-    #     actual = scaler.inverse_transform(data_y[-1].reshape(-1, 1))
-    #
-    #     # Printing and plotting those predictions
-    #     print("Predicted Prices:\n", prediction.tolist())
-    #     plt.plot(prediction, label='Predicted')
-    #
-    #     # Printing and plotting the actual values
-    #     print("\nActual Prices:\n", actual.tolist())
-    #     plt.plot(actual.tolist(), label='Actual')
-    #
-    #     plt.title(f"Predicted vs Actual Closing Prices")
-    #     plt.ylabel("Price")
-    #     plt.legend()
-    #     plt.show()
-    #     # plt.savefig(f"../graphs/result-{date_time_formatted}.png")
+    def train(self):
+        results = self.model.fit(self.get_attributes('train_x'),
+                                 self.get_attributes('train_y'),
+                                 validation_split=self.validation,
+                                 epochs=self.epochs,
+                                 batch_size=self.batch_size,
+                                 verbose=self.log_level)
+
+        # plotting loss
+        history = results.history
+        self.plotter.show(data=[history['val_loss'], history['loss']],
+                          legend=['val_loss', 'loss'],
+                          title='Loss',
+                          x_label='Epochs',
+                          y_label='Loss')
+
+        # plotting accuracy
+        self.plotter.show(data=[history['val_accuracy'], history['accuracy']],
+                          legend=['val_accuracy', 'accuracy'],
+                          title='Accuracy',
+                          x_label='Epochs',
+                          y_label='Accuracy')
+
+    """
+    Verifying model
+    """
+
+    def verify(self):
+        # getting time to add as timestamp to graph
+        date_time = datetime.now()
+        date_time_formatted = date_time.strftime("%d/%m/%Y-%H:%M")
+
+        scaler = self.get_attributes('scaler_y')
+        test_x = self.get_attributes('test_x')
+        test_y = self.get_attributes('test_y')
+        past_steps = self.get_attributes('past_steps')
+        features = self.get_attributes('features')
+
+        # Getting predictions by predicting from the last X
+        prediction = self.model.predict(test_x[-1].reshape(1, past_steps, features)).tolist()[0]
+
+        # Transforming normalized values back to normal range
+        prediction = scaler.inverse_transform(np.array(prediction).reshape(-1, 1))
+
+        # Getting the actual values from the last available y variable which correspond to its respective X variable
+        actual = scaler.inverse_transform(test_y[-1].reshape(-1, 1))
+
+        print("Predicted Prices:\n", prediction.tolist())
+        print("Actual Prices:\n", actual.tolist())
+
+        self.plotter.show(data=[prediction, actual],
+                          legend=['Predicted', 'True'],
+                          title="Predicted vs True Closing Prices",
+                          x_label="Day",
+                          y_label="Price")
+
+    def run(self):
+        self.build()
+        self.train()
+        self.verify()

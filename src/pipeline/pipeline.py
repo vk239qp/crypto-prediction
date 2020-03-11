@@ -10,7 +10,7 @@ class Pipeline:
     def add(self, stage: Stage):
         stage.attach(self)
         self.stages.append(stage)
-        self.properties.update(stage.push_attributes())
+        self.properties.update(stage.gather_attributes())
 
     def process(self):
         for stage in self.stages:
