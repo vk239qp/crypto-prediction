@@ -39,7 +39,7 @@ class Builder(Stage):
                                  validation_split=self.validation,
                                  epochs=self.epochs,
                                  batch_size=self.batch_size,
-                                 verbose=self.log_level)
+                                 verbose=self.log_level, shuffle=False)
 
         # plotting loss
         history = results.history
