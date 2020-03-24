@@ -1,16 +1,14 @@
-from src.neural_network.lstm import LSTMBuilder
-from src.utils.datautil import DataUtil
-
-PREV_DAYS = 30
-FUTURE_DAYS = 7
-LAST_SAMPLES = 1000
+from src.pipeline.pipeline import Pipeline
+from src.stages.execution.lstm_bitcoin import LSTMBitcoin
+from src.stages.execution.lstm_ethereum import LSTMEthereum
+from src.stages.operation.preprocessor import Preprocessor
+from src.stages.source.scrapper import Scrapper
 
 if __name__ == '__main__':
-    util = DataUtil()
-    lstm = LSTMBuilder(PREV_DAYS, FUTURE_DAYS)
+    pipe = Pipeline()
+    pipe.add(Scrapper("scrapper_config"))
+    pipe.add(Preprocessor("preprocessor_config"))
+    # pipe.add(LSTMBitcoin("bitcoin_config"))
+    pipe.add(LSTMEthereum("ethereum_config"))
 
-    x_train, y_train, x_test, y_test = util.prepare(PREV_DAYS, FUTURE_DAYS, LAST_SAMPLES)
-
-    lstm.build()
-    lstm.train(x_train, y_train)
-    lstm.verify(x_test, y_test, util.scaler_y)
+    pipe.process()
