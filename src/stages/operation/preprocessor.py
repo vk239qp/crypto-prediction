@@ -110,3 +110,13 @@ class Preprocessor(Stage):
         self.add_attribute('train_y', train_y)
         self.add_attribute('test_x', test_x)
         self.add_attribute('test_y', test_y)
+
+    def test(self):
+        data_x, data_y = self.load()
+
+        data_x = data_x.replace(0, np.nan).fillna(data_x.mean)
+        data_y = data_y.replace(0, np.nan).fillna(data_y.mean)
+
+        test_x, test_y = self.create_window(data_x, data_y, self.past_steps, self.future_steps)
+
+        self.add_attribute("test_x", test_x)

@@ -62,10 +62,6 @@ class Builder(Stage):
     """
 
     def verify(self):
-        # getting time to add as timestamp to graph
-        date_time = datetime.now()
-        date_time_formatted = date_time.strftime("%d/%m/%Y-%H:%M")
-
         scaler = self.get_attributes('scaler_y')
         test_x = self.get_attributes('test_x')
         test_y = self.get_attributes('test_y')
@@ -91,6 +87,10 @@ class Builder(Stage):
                           x_ticks=1.0,
                           y_label="Price")
 
+    """
+    Saving trained model to H5 file.
+    """
+
     def save(self):
         date_time = datetime.now()
         date_time_formatted = date_time.strftime("%d-%m-%Y-%H:%M")
@@ -106,3 +106,6 @@ class Builder(Stage):
         self.train()
         self.verify()
         self.save()
+
+    def test(self):
+        pass

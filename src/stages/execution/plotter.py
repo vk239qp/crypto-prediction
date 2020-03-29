@@ -1,3 +1,4 @@
+import os
 from datetime import datetime
 
 import matplotlib.pyplot as plt
@@ -5,6 +6,10 @@ import numpy as np
 
 
 class Plotter:
+
+    def __init__(self):
+        self.plot = plt.figure(figsize=(12, 4))
+
     """
     Showing graph.
 
@@ -13,21 +18,39 @@ class Plotter:
     title - Title of the graph.
     x_label - X axis label.
     y_label - Y axis label.
+    time - Boolean whether to add timestamp to graph name.
+    x_ticks - Setting x-axis range.
     """
 
-    def show(self, data: [], legend: [], title: str, x_label: str, y_label: str, x_ticks: float = None):
+    def show(self, data: [], legend: [], title: str, x_label: str, y_label: str, x_ticks: float = None, time=True):
         date_time = datetime.now()
         date_time_formatted = date_time.strftime("%d-%m-%Y-%H:%M")
 
-        plt.figure(figsize=(12, 4))
-
         for data_sample in data:
-            plt.plot(data_sample)
+            self.plot.plot(data_sample)
 
         if x_ticks is not None:
-            plt.xticks(np.arange(1, len(data[0] + 1), 1))
+            self.plot.xticks(np.arange(1, len(data[0] + 1), 1))
 
-        plt.legend(legend)
-        plt.title(f"{title} {date_time_formatted}")
-        plt.xlabel(x_label)
-        plt.ylabel(y_label)
+        self.plot.legend(legend)
+
+        if time:
+            self.plot.title(f"{title} {date_time_formatted}")
+        else:
+            self.plot.title(title)
+
+        self.plot.xlabel(x_label)
+        self.plot.ylabel(y_label)
+        self.plot.show()
+
+    """
+    Saving plot.
+    
+    file_name - name of the file to save.
+    """
+
+    def save(self, file_name: str):
+        if not os.path.exists("../results/graphs/predictions"):
+            os.makedirs("../results/graphs/predictions")
+
+        plt.savefig(f"../results/graphs/predictions/{file_name}")

@@ -36,7 +36,6 @@ class Scrapper(Stage):
     """
 
     def convert(self, input_data: list):
-        self.add_attribute("crypto", self.crypto)
         drop_list = ['conversionType', 'conversionSymbol']
 
         if self.drop_columns is not None:
@@ -62,3 +61,6 @@ class Scrapper(Stage):
         if self.load:
             json_data = self.fetch()
             self.convert(json_data)
+
+    def test(self):
+        self.convert(self.fetch())
