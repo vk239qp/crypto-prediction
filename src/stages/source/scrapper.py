@@ -1,4 +1,5 @@
 import csv
+import os
 
 import requests
 
@@ -35,10 +36,14 @@ class Scrapper(Stage):
     """
 
     def convert(self, input_data: list):
+        self.add_attribute("crypto", self.crypto)
         drop_list = ['conversionType', 'conversionSymbol']
 
         if self.drop_columns is not None:
             drop_list = drop_list + self.drop_columns
+
+        if not os.path.exists('../dataset'):
+            os.makedirs('../dataset')
 
         with open(f'../dataset/prices_{self.crypto}.csv', 'w') as csv_file:
             csv_writer = csv.writer(csv_file)

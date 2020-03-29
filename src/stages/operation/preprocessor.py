@@ -24,13 +24,16 @@ class Preprocessor(Stage):
     """
 
     def load(self):
-        data = pd.read_csv(f'../dataset/prices_{self.get_attributes("crypto")}.csv').tail(self.recent)
+        data = pd.read_csv(f'../dataset/prices_{self.get_attributes("crypto")}.csv').tail(self.recent).reset_index(
+            drop=True)
+        data.index = np.arange(1, len(data) + 1)
+        data['weight'] = data.index.values / self.recent
         data = data.set_index('time')
         data.index = pd.to_datetime(data.index, unit='s')
 
         data_columns = list(data.columns.values)
         data_columns.remove('close')
-        self.add_attribute('features',len(data_columns))
+        self.add_attribute('features', len(data_columns))
 
         data_x = data[data_columns]
         data_y = data['close']
@@ -45,8 +48,8 @@ class Preprocessor(Stage):
         data_x, data_y = self.load()
 
         # getting rid of invalid values
-        data_x = data_x.replace(0, np.nan).fillna(data_x.min())
-        data_y = data_y.replace(0, np.nan).fillna(data_y.min())
+        data_x = data_x.replace(0, np.nan).fillna(data_x.mean)
+        data_y = data_y.replace(0, np.nan).fillna(data_y.mean)
 
         train_x, train_y, test_x, test_y = self.split(data_x, data_y, self.test_size)
 

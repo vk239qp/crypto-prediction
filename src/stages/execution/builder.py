@@ -1,3 +1,4 @@
+import os
 from abc import abstractmethod
 from datetime import datetime
 
@@ -85,11 +86,23 @@ class Builder(Stage):
 
         self.plotter.show(data=[prediction, actual],
                           legend=['Predicted', 'True'],
-                          title="Predicted vs True Closing Prices",
+                          title="Closing Prices",
                           x_label="Day",
+                          x_ticks=1.0,
                           y_label="Price")
+
+    def save(self):
+        date_time = datetime.now()
+        date_time_formatted = date_time.strftime("%d-%m-%Y-%H:%M")
+
+        if not os.path.exists("../results/model"):
+            os.makedirs("../results/model")
+
+        with open(f'../results/model/lstm_{self.get_attributes("crypto")}_{date_time_formatted}.h5', "wb") as file:
+            self.model.save(file)
 
     def run(self):
         self.build()
         self.train()
         self.verify()
+        self.save()
