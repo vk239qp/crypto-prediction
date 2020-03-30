@@ -1,3 +1,4 @@
+import os
 from abc import abstractmethod
 from datetime import datetime
 
@@ -18,6 +19,9 @@ class Builder(Stage):
         self.log_level = self.config["network"]["log"]
         self.validation = self.config["network"]["validation"]
 
+        self.date_time_formatted = datetime.now().strftime("%d-%m-%Y-%H:%M")
+        self.model_name = None
+
         self.model = Sequential()
         self.plotter = Plotter()
 
@@ -34,6 +38,7 @@ class Builder(Stage):
     """
 
     def train(self):
+        self.model_name = f"lstm_{self.get_attributes('crypto')}_{self.date_time_formatted}"
         results = self.model.fit(self.get_attributes('train_x'),
                                  self.get_attributes('train_y'),
                                  validation_split=self.validation,
@@ -41,30 +46,31 @@ class Builder(Stage):
                                  batch_size=self.batch_size,
                                  verbose=self.log_level, shuffle=False)
 
+        if not os.path.exists("../results/graphs"):
+            os.makedirs("../results/graphs")
+
         # plotting loss
         history = results.history
         self.plotter.show(data=[history['val_loss'], history['loss']],
                           legend=['val_loss', 'loss'],
                           title='Loss',
                           x_label='Epochs',
-                          y_label='Loss')
+                          y_label='Loss',
+                          save_name=f"../results/graphs/loss_{self.model_name}")
 
         # plotting accuracy
         self.plotter.show(data=[history['val_accuracy'], history['accuracy']],
                           legend=['val_accuracy', 'accuracy'],
                           title='Accuracy',
                           x_label='Epochs',
-                          y_label='Accuracy')
+                          y_label='Accuracy',
+                          save_name=f"../results/graphs/acc_{self.model_name}")
 
     """
     Verifying model
     """
 
     def verify(self):
-        # getting time to add as timestamp to graph
-        date_time = datetime.now()
-        date_time_formatted = date_time.strftime("%d/%m/%Y-%H:%M")
-
         scaler = self.get_attributes('scaler_y')
         test_x = self.get_attributes('test_x')
         test_y = self.get_attributes('test_y')
@@ -85,11 +91,28 @@ class Builder(Stage):
 
         self.plotter.show(data=[prediction, actual],
                           legend=['Predicted', 'True'],
-                          title="Predicted vs True Closing Prices",
+                          title="Closing Prices",
                           x_label="Day",
-                          y_label="Price")
+                          x_ticks=1.0,
+                          y_label="Price",
+                          save_name=f"../results/graphs/plot_{self.model_name}")
+
+    """
+    Saving trained model to H5 file.
+    """
+
+    def save(self):
+        if not os.path.exists("../results/model"):
+            os.makedirs("../results/model")
+
+        with open(f'../results/model/{self.model_name}.h5', "wb") as file:
+            self.model.save(file)
 
     def run(self):
         self.build()
         self.train()
         self.verify()
+        self.save()
+
+    def test(self):
+        pass

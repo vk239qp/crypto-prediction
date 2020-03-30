@@ -9,11 +9,8 @@ class LSTMEthereum(Builder):
         super().__init__(config_file)
 
     def build(self):
-        self.model.add(LSTM(100, input_shape=(self.get_attributes('past_steps'), self.get_attributes('features')),
-                            activation="tanh", return_sequences=True))
-        self.model.add(LSTM(40, activation="tanh", return_sequences=True))
-        self.model.add(LSTM(40, activation="tanh", return_sequences=True))
-        self.model.add(LSTM(40, activation="tanh"))
+        self.model.add(LSTM(150, input_shape=(self.get_attributes('past_steps'), self.get_attributes('features')),
+                            activation="tanh", return_sequences=False))
         self.model.add(Dense(self.get_attributes('future_steps')))
 
         self.model.compile(loss='mse', optimizer='adam', metrics=['accuracy'])

@@ -1,4 +1,5 @@
 import csv
+import os
 
 import requests
 
@@ -40,6 +41,9 @@ class Scrapper(Stage):
         if self.drop_columns is not None:
             drop_list = drop_list + self.drop_columns
 
+        if not os.path.exists('../dataset'):
+            os.makedirs('../dataset')
+
         with open(f'../dataset/prices_{self.crypto}.csv', 'w') as csv_file:
             csv_writer = csv.writer(csv_file)
 
@@ -57,3 +61,6 @@ class Scrapper(Stage):
         if self.load:
             json_data = self.fetch()
             self.convert(json_data)
+
+    def test(self):
+        self.convert(self.fetch())

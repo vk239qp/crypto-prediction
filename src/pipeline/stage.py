@@ -27,6 +27,14 @@ class Stage(ABC):
         pass
 
     """
+    This method must be implemented in concrete pipeline component. It defines component's logic in test phase.
+    """
+
+    @abstractmethod
+    def test(self):
+        pass
+
+    """
     Obtaining access to pipe and all attributes pushed to the flow.
     """
 
