@@ -6,7 +6,7 @@ from src.stages.source.scrapper import Scrapper
 
 if __name__ == '__main__':
     pipe = Pipeline()
-    train = False
+    train = True
 
     pipe.add(Scrapper("scrapper_config"))
     pipe.add(Preprocessor("preprocessor_config"))

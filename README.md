@@ -19,3 +19,24 @@ Other main libraries:
 * Tensorflow
 * Keras
 * Scikit-learn
+
+### **Project structure**
+
+dataset - Datasets for given cryptos
+
+results/graphs - Graphs create during training
+
+results/graphs/predictions - Prediction graphs for n days
+
+results/model - Stored trained models
+
+src/config - Config for specific stages
+
+src/pipeline - Pipeline base code
+
+src/execution - Execution component's code
+
+src/operation - Operation component's code
+
+src/source - Source component's code
+

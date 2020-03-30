@@ -19,9 +19,8 @@ class Builder(Stage):
         self.log_level = self.config["network"]["log"]
         self.validation = self.config["network"]["validation"]
 
-        date_time = datetime.now()
-        date_time_formatted = date_time.strftime("%d-%m-%Y-%H:%M")
-        self.model_name = f"lstm_{self.get_attributes('crypto')}_{date_time_formatted}"
+        self.date_time_formatted = datetime.now().strftime("%d-%m-%Y-%H:%M")
+        self.model_name = None
 
         self.model = Sequential()
         self.plotter = Plotter()
@@ -39,6 +38,7 @@ class Builder(Stage):
     """
 
     def train(self):
+        self.model_name = f"lstm_{self.get_attributes('crypto')}_{self.date_time_formatted}"
         results = self.model.fit(self.get_attributes('train_x'),
                                  self.get_attributes('train_y'),
                                  validation_split=self.validation,
