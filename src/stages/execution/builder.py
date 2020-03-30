@@ -19,6 +19,10 @@ class Builder(Stage):
         self.log_level = self.config["network"]["log"]
         self.validation = self.config["network"]["validation"]
 
+        date_time = datetime.now()
+        date_time_formatted = date_time.strftime("%d-%m-%Y-%H:%M")
+        self.model_name = f"lstm_{self.get_attributes('crypto')}_{date_time_formatted}"
+
         self.model = Sequential()
         self.plotter = Plotter()
 
@@ -42,20 +46,25 @@ class Builder(Stage):
                                  batch_size=self.batch_size,
                                  verbose=self.log_level, shuffle=False)
 
+        if not os.path.exists("../results/graphs"):
+            os.makedirs("../results/graphs")
+
         # plotting loss
         history = results.history
         self.plotter.show(data=[history['val_loss'], history['loss']],
                           legend=['val_loss', 'loss'],
                           title='Loss',
                           x_label='Epochs',
-                          y_label='Loss')
+                          y_label='Loss',
+                          save_name=f"../results/graphs/loss_{self.model_name}")
 
         # plotting accuracy
         self.plotter.show(data=[history['val_accuracy'], history['accuracy']],
                           legend=['val_accuracy', 'accuracy'],
                           title='Accuracy',
                           x_label='Epochs',
-                          y_label='Accuracy')
+                          y_label='Accuracy',
+                          save_name=f"../results/graphs/acc_{self.model_name}")
 
     """
     Verifying model
@@ -85,20 +94,18 @@ class Builder(Stage):
                           title="Closing Prices",
                           x_label="Day",
                           x_ticks=1.0,
-                          y_label="Price")
+                          y_label="Price",
+                          save_name=f"../results/graphs/plot_{self.model_name}")
 
     """
     Saving trained model to H5 file.
     """
 
     def save(self):
-        date_time = datetime.now()
-        date_time_formatted = date_time.strftime("%d-%m-%Y-%H:%M")
-
         if not os.path.exists("../results/model"):
             os.makedirs("../results/model")
 
-        with open(f'../results/model/lstm_{self.get_attributes("crypto")}_{date_time_formatted}.h5', "wb") as file:
+        with open(f'../results/model/{self.model_name}.h5', "wb") as file:
             self.model.save(file)
 
     def run(self):

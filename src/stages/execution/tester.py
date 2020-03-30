@@ -1,3 +1,5 @@
+import os
+
 from src.pipeline.stage import Stage
 from keras.models import load_model
 import numpy as np
@@ -22,15 +24,17 @@ class Tester(Stage):
         prediction = self.model.predict(test_x[-1].reshape(1, past_steps, features)).tolist()[0]
         prediction = scaler.inverse_transform(np.array(prediction).reshape(-1, 1))
 
+        if not os.path.exists("../results/graphs/predictions"):
+            os.makedirs("../results/graphs/predictions")
+
         self.plotter.show(data=[prediction],
                           legend=['Predicted'],
                           title=f"Model {self.model_file} prediction",
                           x_label="Day",
                           x_ticks=1.0,
                           time=False,
+                          save_name=f"../results/graphs/predictions/prediction_{self.model_file}",
                           y_label="Closing price")
-
-        self.plotter.save(f"prediction_{self.get_attributes('crypto')}_{self.model_file}.png")
 
     def run(self):
         pass
