@@ -3,8 +3,7 @@ from abc import abstractmethod
 from datetime import datetime
 
 from keras import Sequential
-from pandas import np
-
+import numpy as np
 from src.pipeline.stage import Stage
 from src.stages.execution.plotter import Plotter
 
@@ -51,20 +50,20 @@ class Builder(Stage):
 
         # plotting loss
         history = results.history
-        self.plotter.show(data=[history['val_loss'], history['loss']],
+        self.plotter.plot(data=[history['val_loss'], history['loss']],
                           legend=['val_loss', 'loss'],
                           title='Loss',
                           x_label='Epochs',
                           y_label='Loss',
                           save_name=f"../results/graphs/loss_{self.model_name}")
 
-        # plotting accuracy
-        self.plotter.show(data=[history['val_accuracy'], history['accuracy']],
-                          legend=['val_accuracy', 'accuracy'],
-                          title='Accuracy',
+        # plotting metric
+        self.plotter.plot(data=[history[f'val_{self.model.metrics_names[1]}'], history[self.model.metrics_names[1]]],
+                          legend=[f'val_{self.model.metrics_names[1]}', self.model.metrics_names[1]],
+                          title=self.model.metrics_names[1],
                           x_label='Epochs',
-                          y_label='Accuracy',
-                          save_name=f"../results/graphs/acc_{self.model_name}")
+                          y_label='Metric',
+                          save_name=f"../results/graphs/metric_{self.model_name}")
 
     """
     Verifying model
@@ -89,7 +88,7 @@ class Builder(Stage):
         print("Predicted Prices:\n", prediction.tolist())
         print("Actual Prices:\n", actual.tolist())
 
-        self.plotter.show(data=[prediction, actual],
+        self.plotter.plot(data=[prediction, actual],
                           legend=['Predicted', 'True'],
                           title="Closing Prices",
                           x_label="Day",
@@ -98,15 +97,20 @@ class Builder(Stage):
                           save_name=f"../results/graphs/plot_{self.model_name}")
 
     """
-    Saving trained model to H5 file.
+    Saving trained model with weights.
     """
 
     def save(self):
         if not os.path.exists("../results/model"):
             os.makedirs("../results/model")
 
-        with open(f'../results/model/{self.model_name}.h5', "wb") as file:
-            self.model.save(file)
+        # serialize model to JSON
+        model_json = self.model.to_json()
+        with open(f"../results/model/{self.model_name}.json", "w") as json_file:
+            json_file.write(model_json)
+        # serialize weights to HDF5
+        with open(f'../results/model/{self.model_name}_weights.h5', "wb") as file:
+            self.model.save_weights(file)
 
     def run(self):
         self.build()

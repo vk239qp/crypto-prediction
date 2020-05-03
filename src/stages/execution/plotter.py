@@ -6,7 +6,7 @@ import numpy as np
 
 class Plotter:
     """
-    Showing graph.
+    Showing and saving graph.
 
     data - Array of data to be plotted.
     legend - Legend of the graph.
@@ -18,7 +18,7 @@ class Plotter:
     x_ticks - Setting x-axis range.
     """
 
-    def show(self, data: [], legend: [], title: str, x_label: str, y_label: str, save_name: str, x_ticks: float = None,
+    def plot(self, data: [], legend: [], title: str, x_label: str, y_label: str, save_name: str, x_ticks: float = None,
              time=True):
         date_time = datetime.now()
         date_time_formatted = date_time.strftime("%d-%m-%Y-%H:%M")
@@ -40,4 +40,5 @@ class Plotter:
 
         plt.xlabel(x_label)
         plt.ylabel(y_label)
+        plt.show()
         plt.savefig(f"{save_name}.png")

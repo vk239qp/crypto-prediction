@@ -1,8 +1,8 @@
 preprocessor:
   data:
-    recent: 365
+    recent: 500
     test_size: 0.2
-    strategy: drop # possible values: drop, fill_min, fill_max, fill_median
+    strategy: drop
   window:
-    past: 14
+    past: 21
     future: 7
