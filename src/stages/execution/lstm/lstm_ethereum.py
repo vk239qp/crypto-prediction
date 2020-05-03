@@ -1,5 +1,4 @@
-from keras.layers import LSTM, Dense, Dropout, Activation
-from keras.optimizers import Adam
+from keras.layers import LSTM, Dense
 from numpy import random
 from tensorflow_core import metrics
 
@@ -12,13 +11,10 @@ class LSTMEthereum(Builder):
         super().__init__(config_file)
 
     def build(self):
-        random.seed(52)
-        self.model.add(LSTM(256, input_shape=(self.get_attributes('past_steps'), self.get_attributes('features')),
-                            return_sequences=False))
-        self.model.add(Dropout(0.2))
+        random.seed(1337)
+        self.model.add(LSTM(20, input_shape=(self.get_attributes('past_steps'), self.get_attributes('features'))))
         self.model.add(Dense(self.get_attributes('future_steps')))
-        self.model.add(Activation("tanh"))
 
-        self.model.compile(loss='mse', optimizer=Adam(learning_rate=0.002),
+        self.model.compile(loss='mae', optimizer='adam',
                            metrics=[metrics.RootMeanSquaredError(name='rmse')])
         self.model.summary()

@@ -1,8 +1,8 @@
 preprocessor:
   data:
-    recent: 500
+    recent: 365
     test_size: 0.2
     strategy: drop
   window:
-    past: 21
-    future: 7
+    past: 5
+    future: 5

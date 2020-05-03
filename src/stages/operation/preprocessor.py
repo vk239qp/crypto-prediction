@@ -26,8 +26,14 @@ class Preprocessor(Stage):
     def load(self):
         data = pd.read_csv(f'../dataset/prices_{self.get_attributes("crypto")}.csv').tail(self.recent).reset_index(
             drop=True)
-        data.index = np.arange(1, len(data) + 1)
-        data['weight'] = data.index.values / self.recent
+
+        # adding custom features
+        data['close_ratio'] = (data['close'] - data['low']) / (data['high'] - data['low'])
+        data['delta_day'] = data['high'] - data['low']
+        data['prices_mean'] = data[['open', 'close', 'high', 'low']].mean(axis=1)
+        data['pct_change'] = data['prices_mean'].pct_change()
+
+        # setting time as index
         data = data.set_index('time')
         data.index = pd.to_datetime(data.index, unit='s')
 
@@ -48,8 +54,8 @@ class Preprocessor(Stage):
         data_x, data_y = self.load()
 
         # getting rid of invalid values
-        data_x = data_x.replace(0, np.nan).fillna(data_x.mean)
-        data_y = data_y.replace(0, np.nan).fillna(data_y.mean)
+        data_x = data_x.fillna(0)
+        data_y = data_y.fillna(0)
 
         train_x, train_y, test_x, test_y = self.split(data_x, data_y, self.test_size)
 
