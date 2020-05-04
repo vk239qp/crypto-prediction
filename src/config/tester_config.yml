@@ -1,2 +1,4 @@
 model:
-  name: lstm_ETH_06-04-2020-21:23
+  name: lstm_ETH_04-05-2020-16:33
+  compare: True
+  days_to_compare: 5

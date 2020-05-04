@@ -23,7 +23,7 @@ class Plotter:
         date_time = datetime.now()
         date_time_formatted = date_time.strftime("%d-%m-%Y-%H:%M")
 
-        plt.figure(figsize=(12, 4))
+        plt.figure(figsize=(12, 5))
 
         for data_sample in data:
             plt.plot(data_sample)
@@ -40,5 +40,5 @@ class Plotter:
 
         plt.xlabel(x_label)
         plt.ylabel(y_label)
-        plt.show()
         plt.savefig(f"{save_name}.png")
+        plt.show()

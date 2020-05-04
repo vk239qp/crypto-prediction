@@ -2,4 +2,3 @@ network:
   batch: 72
   epochs: 130
   log: 2
-  validation: 0.1

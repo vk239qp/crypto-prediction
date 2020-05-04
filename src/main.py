@@ -6,14 +6,19 @@ from src.stages.source.scrapper import Scrapper
 
 if __name__ == '__main__':
     pipe = Pipeline()
-    train = True
+    train = False
+    test = False
 
     pipe.add(Scrapper("scrapper_config"))
-    pipe.add(Preprocessor("preprocessor_config"))
 
     if train:
+        pipe.add(Preprocessor("preprocessor_config"))
         pipe.add(LSTMEthereum("ethereum_config"))
         pipe.process()
+    elif test:
+        pipe.add(Preprocessor("preprocessor_config"))
+        pipe.add(Tester("tester_config"))
+        pipe.test()
     else:
         pipe.add(Tester("tester_config"))
         pipe.test()

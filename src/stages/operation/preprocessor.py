@@ -14,7 +14,6 @@ class Preprocessor(Stage):
         self.scaler_y = MinMaxScaler()
 
         self.recent = self.config["preprocessor"]["data"]["recent"]
-        self.strategy = self.config["preprocessor"]["data"]["strategy"]
         self.test_size = self.config["preprocessor"]["data"]["test_size"]
         self.past_steps = self.config["preprocessor"]["window"]["past"]
         self.future_steps = self.config["preprocessor"]["window"]["future"]
@@ -120,8 +119,8 @@ class Preprocessor(Stage):
     def test(self):
         data_x, data_y = self.load()
 
-        data_x = data_x.replace(0, np.nan).fillna(data_x.mean)
-        data_y = data_y.replace(0, np.nan).fillna(data_y.mean)
+        data_x = data_x.fillna(0)
+        data_y = data_y.fillna(0)
 
         test_x, test_y = self.create_window(data_x, data_y, self.past_steps, self.future_steps)
 

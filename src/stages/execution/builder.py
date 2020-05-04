@@ -16,7 +16,6 @@ class Builder(Stage):
         self.batch_size = self.config["network"]["batch"]
         self.epochs = self.config["network"]["epochs"]
         self.log_level = self.config["network"]["log"]
-        self.validation = self.config["network"]["validation"]
 
         self.date_time_formatted = datetime.now().strftime("%d-%m-%Y-%H:%M")
         self.model_name = None
@@ -40,7 +39,7 @@ class Builder(Stage):
         self.model_name = f"lstm_{self.get_attributes('crypto')}_{self.date_time_formatted}"
         results = self.model.fit(self.get_attributes('train_x'),
                                  self.get_attributes('train_y'),
-                                 validation_split=self.validation,
+                                 validation_data=(self.get_attributes('test_x'), self.get_attributes('test_y')),
                                  epochs=self.epochs,
                                  batch_size=self.batch_size,
                                  verbose=self.log_level, shuffle=False)

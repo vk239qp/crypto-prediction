@@ -18,7 +18,7 @@ class Scrapper(Stage):
         self.load = self.config["scrapper"]["load"]
 
     """
-    Getting latest data from cryptocompare api. Response JSON must be parsed due to further preprocessing.
+    Getting latest data from cryptocompare API. Response JSON must be parsed due to further preprocessing.
     """
 
     def fetch(self):
