@@ -10,10 +10,10 @@ from src.stages.execution.plotter import Plotter
 
 class Tester(Stage):
 
-    def __init__(self, config_file: str):
+    def __init__(self, config_file: str, only_compare=False):
         super().__init__(config_file)
+        self.only_compare = only_compare
         self.model_file = self.config["model"]["name"]
-        self.only_compare = self.config["model"]["compare"]
         self.days_to_compare = self.config["model"]["days_to_compare"]
 
         # load json and create model
@@ -48,7 +48,7 @@ class Tester(Stage):
 
     def predict(self):
         scaler = self.get_attributes('scaler_y')
-        test_x = self.get_attributes('test_x')[-1]
+        test_x = self.get_attributes('test_x')
         past_steps = self.get_attributes('past_steps')
         features = self.get_attributes('features')
 
