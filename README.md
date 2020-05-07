@@ -26,9 +26,9 @@ dataset - Datasets for given cryptos
 
 results/graphs - Graphs create during training
 
-results/graphs/predictions - Prediction graphs for n days
+results/predictions - Prediction graphs for n days
 
-results/model - Stored trained models
+results/model - Stored trained models with weights
 
 src/config - Config for specific stages
 

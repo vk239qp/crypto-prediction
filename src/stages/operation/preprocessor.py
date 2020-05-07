@@ -29,7 +29,6 @@ class Preprocessor(Stage):
             drop=True)
 
         # adding custom features
-        data['close_ratio'] = (data['close'] - data['low']) / (data['high'] - data['low'])
         data['delta_day'] = data['high'] - data['low']
         data['prices_mean'] = data[['open', 'close', 'high', 'low']].mean(axis=1)
         data['pct_change'] = data['prices_mean'].pct_change()
