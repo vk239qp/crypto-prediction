@@ -24,6 +24,8 @@ class Scrapper(Stage):
     """
 
     def fetch_prices(self):
+        print("SCRAPPING PRICES...")
+
         headers = {"Apikey": self.token}
         params = {"fsym": self.crypto, "tsym": "EUR", "allData": "true"}
 
@@ -36,6 +38,8 @@ class Scrapper(Stage):
     """
 
     def fetch_comments(self):
+        print("SCRAPPING COMMENTS...")
+
         subreddit = "cryptocurrency"
 
         if self.crypto == "ETH":
@@ -58,7 +62,6 @@ class Scrapper(Stage):
 
             payload.append(requests.get(url=self.comments_url, params=params).json()['data'])
             days -= 1
-            print(days)
 
         return payload
 

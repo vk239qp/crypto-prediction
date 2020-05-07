@@ -34,18 +34,11 @@ class Preprocessor(Stage):
         data['prices_mean'] = data[['open', 'close', 'high', 'low']].mean(axis=1)
         data['pct_change'] = data['prices_mean'].pct_change()
 
-        # setting time as index
+        # setting time as index and converting to UTC
         data = data.set_index('time')
         data.index = pd.to_datetime(data.index, unit='s')
 
-        data_columns = list(data.columns.values)
-        data_columns.remove('close')
-        self.add_attribute('features', len(data_columns))
-
-        data_x = data[data_columns]
-        data_y = data['close']
-
-        return data_x, data_y
+        return data
 
     """
     Loading comments from csv.
@@ -67,15 +60,40 @@ class Preprocessor(Stage):
         data[['compound', 'negative', 'neutral', 'positive']] = data['body'].apply(
             lambda body: pd.Series(analyzer.polarity_scores(body)))
 
+        # grouping data by day and creating mean value from them
         data_merged = data.set_index('created_utc').groupby(pd.Grouper(freq='D')).mean().dropna()
+
+        # adding number of comments as column
         data_merged['num_comments'] = data.set_index('created_utc').resample('D').size()
+
+        # getting last N datas
+        data_merged = data_merged[:self.recent]
+
+        return data_merged
+
+    """
+    Merging prices and comments datasets.
+    """
+
+    def merge_datasets(self):
+        merged = pd.merge(self.load_comments(), self.load_prices(), how='inner', left_index=True, right_index=True)
+
+        # splitting data to features and targets
+        data_columns = list(merged.columns.values)
+        data_columns.remove('close')
+        self.add_attribute('features', len(data_columns))
+
+        data_x = merged[data_columns]
+        data_y = merged['close']
+
+        return data_x, data_y
 
     """
     Preparing data for LSTM network.
     """
 
     def prepare(self):
-        data_x, data_y = self.load_prices()
+        data_x, data_y = self.merge_datasets()
 
         # getting rid of invalid values
         data_x = data_x.fillna(0)
@@ -142,7 +160,7 @@ class Preprocessor(Stage):
         self.add_attribute('test_y', test_y)
 
     def test(self):
-        data_x, data_y = self.load_prices()
+        data_x, data_y = self.merge_datasets()
 
         data_x = data_x.fillna(0)
         data_y = data_y.fillna(0)
