@@ -24,7 +24,6 @@ class Preprocessor(Stage):
     """
 
     def load_prices(self):
-        self.load_comments()
         data = pd.read_csv(f'../dataset/prices_{self.get_attributes("crypto")}.csv').tail(self.recent).reset_index(
             drop=True)
 
@@ -44,6 +43,8 @@ class Preprocessor(Stage):
     """
 
     def load_comments(self):
+        print("ANALYSING SENTIMENTS OF COMMENTS...")
+
         data = pd.read_csv(f'../dataset/comments_{self.get_attributes("crypto")}.csv').reset_index(
             drop=True)
 
