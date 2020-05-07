@@ -13,11 +13,10 @@ class Scrapper(Stage):
     def __init__(self, config_file: str):
         super().__init__(config_file)
 
-        self.url = self.config["cryptocompare"]["url"]
+        self.prices_url = self.config["cryptocompare"]["url"]
         self.comments_url = self.config["pushshift"]["url"]
         self.token = self.config["cryptocompare"]["token"]
         self.crypto = self.config["cryptocompare"]["crypto"]
-        self.drop_columns = self.config["scrapper"]["drop_columns"]
         self.load = self.config["scrapper"]["load"]
 
     """
@@ -28,7 +27,7 @@ class Scrapper(Stage):
         headers = {"Apikey": self.token}
         params = {"fsym": self.crypto, "tsym": "EUR", "allData": "true"}
 
-        payload = requests.get(url=self.url, headers=headers, params=params).json()
+        payload = requests.get(url=self.prices_url, headers=headers, params=params).json()
 
         return payload['Data']['Data']
 
@@ -37,35 +36,40 @@ class Scrapper(Stage):
     """
 
     def fetch_comments(self):
-        n_days_ago = datetime.now() - timedelta(days=500)
-        n_days_unix = time.mktime(n_days_ago.timetuple())
-
         subreddit = "cryptocurrency"
 
         if self.crypto == "ETH":
             subreddit = "ethereum"
         elif self.crypto == "BTC":
             subreddit = "bitcoin"
-        # TODO pridat vilovu krypto
+        elif self.crypto == "XTZ":
+            subreddit = "tezos"
 
-        params = {"sort_type": "created_utc", "sort": "asc", "after": int(n_days_unix), "size": "1000000",
-                  "subreddit": subreddit}
+        days = 500
+        payload = []
 
-        payload = requests.get(url=self.comments_url, params=params).json()
+        while days != 0:
+            time.sleep(1)
+            n_days_ago = datetime.now() - timedelta(days=days)
+            n_days_unix = time.mktime(n_days_ago.timetuple())
 
-        return payload['data']
+            params = {"sort_type": "created_utc", "sort": "asc", "after": int(n_days_unix), "size": 1000,
+                      "subreddit": subreddit}
+
+            payload.append(requests.get(url=self.comments_url, params=params).json()['data'])
+            days -= 1
+            print(days)
+
+        return payload
 
     """
-    Transforming parsed JSON to CSV file.
+    Transforming parsed JSON of prices to CSV file.
     
     input_data - List of dictionaries containing data.
     """
 
     def convert_prices(self, input_data: list):
         drop_list = ['conversionType', 'conversionSymbol']
-
-        if self.drop_columns is not None:
-            drop_list = drop_list + self.drop_columns
 
         if not os.path.exists('../dataset'):
             os.makedirs('../dataset')
@@ -83,6 +87,12 @@ class Scrapper(Stage):
 
                 csv_writer.writerow(row.values())
 
+    """
+    Transforming parsed JSON of comments to CSV file.
+
+    input_data - List of dictionaries containing data.
+    """
+
     def convert_comments(self, input_data: list):
         if not os.path.exists('../dataset'):
             os.makedirs('../dataset')
@@ -90,12 +100,12 @@ class Scrapper(Stage):
         with open(f'../dataset/comments_{self.crypto}.csv', 'w') as csv_file:
             csv_writer = csv.writer(csv_file)
 
-            for index, row in enumerate(input_data):
+            for index, _ in enumerate(input_data):
                 if index == 0:
-                    header = row.keys()
-                    csv_writer.writerow(header)
-
-                csv_writer.writerow(row.values())
+                    csv_writer.writerow(['created_utc', 'body', 'score'])
+                for _, row in enumerate(input_data[index]):
+                    values = (row['created_utc'], row['body'], row['score'])
+                    csv_writer.writerow(values)
 
     def run(self):
         if self.load:
@@ -103,5 +113,6 @@ class Scrapper(Stage):
             self.convert_comments(self.fetch_comments())
 
     def test(self):
-        self.convert_prices(self.fetch_prices())
-        self.convert_comments(self.fetch_comments())
+        if self.load:
+            self.convert_prices(self.fetch_prices())
+            self.convert_comments(self.fetch_comments())

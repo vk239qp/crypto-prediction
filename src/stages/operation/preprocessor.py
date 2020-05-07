@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 from pandas import DataFrame
 from sklearn.preprocessing import MinMaxScaler
+from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 
 from src.pipeline.stage import Stage
 
@@ -19,10 +20,11 @@ class Preprocessor(Stage):
         self.future_steps = self.config["preprocessor"]["window"]["future"]
 
     """
-    Loading data from csv.
+    Loading prices from csv.
     """
 
-    def load(self):
+    def load_prices(self):
+        self.load_comments()
         data = pd.read_csv(f'../dataset/prices_{self.get_attributes("crypto")}.csv').tail(self.recent).reset_index(
             drop=True)
 
@@ -46,11 +48,34 @@ class Preprocessor(Stage):
         return data_x, data_y
 
     """
+    Loading comments from csv.
+    """
+
+    def load_comments(self):
+        data = pd.read_csv(f'../dataset/comments_{self.get_attributes("crypto")}.csv').reset_index(
+            drop=True)
+
+        # converting time to UTC
+        data['created_utc'] = pd.to_datetime(data['created_utc'], unit='s')
+
+        # removing invalid comments
+        data = data[data.body != '[removed]']
+        data = data[data.body != '[deleted]']
+
+        # adding sentiment columns
+        analyzer = SentimentIntensityAnalyzer()
+        data[['compound', 'negative', 'neutral', 'positive']] = data['body'].apply(
+            lambda body: pd.Series(analyzer.polarity_scores(body)))
+
+        data_merged = data.set_index('created_utc').groupby(pd.Grouper(freq='D')).mean().dropna()
+        data_merged['num_comments'] = data.set_index('created_utc').resample('D').size()
+
+    """
     Preparing data for LSTM network.
     """
 
     def prepare(self):
-        data_x, data_y = self.load()
+        data_x, data_y = self.load_prices()
 
         # getting rid of invalid values
         data_x = data_x.fillna(0)
@@ -117,7 +142,7 @@ class Preprocessor(Stage):
         self.add_attribute('test_y', test_y)
 
     def test(self):
-        data_x, data_y = self.load()
+        data_x, data_y = self.load_prices()
 
         data_x = data_x.fillna(0)
         data_y = data_y.fillna(0)
