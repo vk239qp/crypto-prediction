@@ -1,5 +1,6 @@
 scrapper:
-  load: true
+  load: false
+  recent: 500
 
 cryptocompare:
   url: https://min-api.cryptocompare.com/data/v2/histoday

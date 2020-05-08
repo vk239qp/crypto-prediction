@@ -18,6 +18,7 @@ class Scrapper(Stage):
         self.token = self.config["cryptocompare"]["token"]
         self.crypto = self.config["cryptocompare"]["crypto"]
         self.load = self.config["scrapper"]["load"]
+        self.recent = self.config["scrapper"]["recent"]
 
     """
     Getting latest data from cryptocompare API. Response JSON must be parsed due to further preprocessing.
@@ -49,7 +50,7 @@ class Scrapper(Stage):
         elif self.crypto == "XTZ":
             subreddit = "tezos"
 
-        days = 500
+        days = self.recent
         payload = []
 
         while days != 0:

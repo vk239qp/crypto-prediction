@@ -14,7 +14,6 @@ class Preprocessor(Stage):
         self.scaler_x = MinMaxScaler()
         self.scaler_y = MinMaxScaler()
 
-        self.recent = self.config["preprocessor"]["data"]["recent"]
         self.test_size = self.config["preprocessor"]["data"]["test_size"]
         self.past_steps = self.config["preprocessor"]["window"]["past"]
         self.future_steps = self.config["preprocessor"]["window"]["future"]
@@ -24,8 +23,8 @@ class Preprocessor(Stage):
     """
 
     def load_prices(self):
-        data = pd.read_csv(f'../dataset/prices_{self.get_attributes("crypto")}.csv').tail(self.recent).reset_index(
-            drop=True)
+        data = pd.read_csv(f'../dataset/prices_{self.get_attributes("crypto")}.csv').tail(
+            self.get_attributes("recent")).reset_index(drop=True)
 
         # adding custom features
         data['delta_day'] = data['high'] - data['low']
@@ -57,8 +56,7 @@ class Preprocessor(Stage):
 
         # adding sentiment columns
         analyzer = SentimentIntensityAnalyzer()
-        data[['compound', 'negative', 'neutral', 'positive']] = data['body'].apply(
-            lambda body: pd.Series(analyzer.polarity_scores(body)))
+        data['compound'] = data['body'].apply(lambda body: pd.Series(analyzer.polarity_scores(body)))['compound']
 
         # grouping data by day and creating mean value from them
         data_merged = data.set_index('created_utc').groupby(pd.Grouper(freq='D')).mean().dropna()
@@ -67,7 +65,7 @@ class Preprocessor(Stage):
         data_merged['num_comments'] = data.set_index('created_utc').resample('D').size()
 
         # getting last N datas
-        data_merged = data_merged[:self.recent]
+        data_merged = data_merged[:self.get_attributes("recent")]
 
         return data_merged
 
