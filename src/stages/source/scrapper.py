@@ -10,15 +10,17 @@ from src.pipeline.stage import Stage
 
 class Scrapper(Stage):
 
-    def __init__(self, config_file: str):
+    def __init__(self, config_file: str, crypto: str):
         super().__init__(config_file)
 
-        self.prices_url = self.config["cryptocompare"]["url"]
-        self.comments_url = self.config["pushshift"]["url"]
-        self.token = self.config["cryptocompare"]["token"]
-        self.crypto = self.config["cryptocompare"]["crypto"]
+        self.crypto = crypto
+
         self.load = self.config["scrapper"]["load"]
         self.recent = self.config["scrapper"]["recent"]
+        self.prices_url = self.config["cryptocompare"]["url"]
+        self.token = self.config["cryptocompare"]["token"]
+        self.comments_load = self.config["pushshift"]["load"]
+        self.comments_url = self.config["pushshift"]["url"]
 
     """
     Getting latest data from cryptocompare API. Response JSON must be parsed due to further preprocessing.
