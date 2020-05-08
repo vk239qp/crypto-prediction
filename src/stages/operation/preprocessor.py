@@ -53,10 +53,10 @@ class Preprocessor(Stage):
         # using old dataset
         if not comments_load:
             saved_dataset = pd.read_csv(dataset_file_name, index_col=0)
+
             return saved_dataset
 
-        data = pd.read_csv(f'../dataset/comments_{self.get_attributes("crypto")}.csv').reset_index(
-            drop=True)
+        data = pd.read_csv(dataset_file_name).reset_index(drop=True)
 
         # converting time to UTC
         data['created_utc'] = pd.to_datetime(data['created_utc'], unit='s')

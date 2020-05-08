@@ -32,6 +32,8 @@ results/model - Stored trained models with weights
 
 src/config - Config for specific stages
 
+src/helpers - Helper classes
+
 src/pipeline - Pipeline base code
 
 src/execution - Execution component's code
