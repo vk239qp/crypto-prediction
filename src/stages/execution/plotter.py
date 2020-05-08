@@ -14,15 +14,10 @@ class Plotter:
     x_label - X axis label.
     y_label - Y axis label.
     save_name - Path of the file where graph will be stored.
-    time - Boolean whether to add timestamp to graph name.
     x_ticks - Setting x-axis range.
     """
 
-    def plot(self, data: [], legend: [], title: str, x_label: str, y_label: str, save_name: str, x_ticks: float = None,
-             time=True):
-        date_time = datetime.now()
-        date_time_formatted = date_time.strftime("%d-%m-%Y-%H:%M")
-
+    def plot(self, data: [], legend: [], title: str, x_label: str, y_label: str, save_name: str, x_ticks: float = None):
         plt.figure(figsize=(12, 5))
 
         for data_sample in data:
@@ -32,11 +27,7 @@ class Plotter:
             plt.xticks(np.arange(0, len(data[0]), 1))
 
         plt.legend(legend)
-
-        if time:
-            plt.title(f"{title} {date_time_formatted}")
-        else:
-            plt.title(title)
+        plt.title(title)
 
         plt.xlabel(x_label)
         plt.ylabel(y_label)

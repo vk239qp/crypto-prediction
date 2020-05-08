@@ -42,7 +42,6 @@ class Tester(Stage):
                           title="Real vs Predicted prices",
                           x_label="Day",
                           x_ticks=1.0,
-                          time=False,
                           y_label="Price",
                           save_name=f"../results/predictions/compare_{self.model_file}")
 
@@ -67,7 +66,6 @@ class Tester(Stage):
                           title=f"Model {self.model_file} prediction",
                           x_label="Day",
                           x_ticks=1.0,
-                          time=False,
                           save_name=f"../results/predictions/prediction_{self.model_file}",
                           y_label="Closing price")
 
