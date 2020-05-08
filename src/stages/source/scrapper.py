@@ -10,13 +10,13 @@ from src.pipeline.stage import Stage
 
 class Scrapper(Stage):
 
-    def __init__(self, config_file: str):
+    def __init__(self, config_file: str, crypto: str):
         super().__init__(config_file)
 
         self.prices_url = self.config["cryptocompare"]["url"]
         self.comments_url = self.config["pushshift"]["url"]
         self.token = self.config["cryptocompare"]["token"]
-        self.crypto = self.config["cryptocompare"]["crypto"]
+        self.crypto = crypto
         self.load = self.config["scrapper"]["load"]
         self.recent = self.config["scrapper"]["recent"]
 

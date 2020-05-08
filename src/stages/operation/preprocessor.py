@@ -56,7 +56,10 @@ class Preprocessor(Stage):
 
         # adding sentiment columns
         analyzer = SentimentIntensityAnalyzer()
-        data['compound'] = data['body'].apply(lambda body: pd.Series(analyzer.polarity_scores(body)))['compound']
+        try:
+            data['compound'] = data['body'].apply(lambda body: pd.Series(analyzer.polarity_scores(body)))['compound']
+        except TypeError as e:
+            print(e)
 
         # grouping data by day and creating mean value from them
         data_merged = data.set_index('created_utc').groupby(pd.Grouper(freq='D')).mean().dropna()

@@ -1,5 +1,8 @@
+from src.helpers.CryptoCurrency import CryptoCurrency
+from src.helpers.Runner import Runner
 from src.pipeline.pipeline import Pipeline
 from src.stages.execution.lstm.lstm_ethereum import LSTMEthereum
+from src.stages.execution.lstm.lstm_bitcoin import LSTMBitcoin
 from src.stages.execution.tester import Tester
 from src.stages.operation.preprocessor import Preprocessor
 from src.stages.source.scrapper import Scrapper
@@ -7,17 +10,8 @@ from src.stages.source.scrapper import Scrapper
 if __name__ == '__main__':
     # 0 - train, 1 - test, 2 - comparing
     mode = 0
-    pipe = Pipeline()
-    pipe.add(Scrapper("scrapper_config"))
-
-    if mode == 0:
-        pipe.add(Preprocessor("preprocessor_config"))
-        pipe.add(LSTMEthereum("ethereum_config"))
-        pipe.process()
-    elif mode == 1:
-        pipe.add(Preprocessor("preprocessor_config"))
-        pipe.add(Tester("tester_config"))
-        pipe.test()
-    elif mode == 2:
-        pipe.add(Tester("tester_config", only_compare=True))
-        pipe.test()
+    # CryptoCurrency("Bitcoin", "BTC")
+    crypto_currencies_to_run = [
+        CryptoCurrency("Ethereum", "ETC")
+    ]
+    Runner(crypto_currencies_to_run, mode)
