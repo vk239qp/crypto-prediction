@@ -10,8 +10,9 @@ from src.stages.source.scrapper import Scrapper
 if __name__ == '__main__':
     # 0 - train, 1 - test, 2 - comparing
     mode = 0
-    # CryptoCurrency("Bitcoin", "BTC")
+
     crypto_currencies_to_run = [
-        CryptoCurrency("Ethereum", "ETC")
+        CryptoCurrency("Bitcoin", "BTC")
+        # CryptoCurrency("Ethereum", "ETC")
     ]
     Runner(crypto_currencies_to_run, mode)
