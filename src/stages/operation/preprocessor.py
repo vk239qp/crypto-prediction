@@ -23,8 +23,18 @@ class Preprocessor(Stage):
     """
 
     def load_prices(self):
-        data = pd.read_csv(f'../dataset/prices_{self.get_attributes("crypto")}.csv').tail(
-            self.get_attributes("recent")).reset_index(drop=True)
+        dataset_file_name = f'../dataset/prices_{self.get_attributes("crypto")}.csv'
+
+        data = pd.read_csv(dataset_file_name).tail(self.get_attributes("recent")).reset_index(drop=True)
+
+        # checking if we wanna load new comments or use older saved dataset
+        price_load = self.get_attributes("price_load")
+
+        # using old dataset
+        if not price_load:
+            saved_dataset = pd.read_csv(dataset_file_name, index_col=0)
+
+            return saved_dataset
 
         # adding custom features
         data['delta_day'] = data['high'] - data['low']
@@ -34,6 +44,8 @@ class Preprocessor(Stage):
         # setting time as index and converting to UTC
         data = data.set_index('time')
         data.index = pd.to_datetime(data.index, unit='s')
+
+        data.to_csv(dataset_file_name)
 
         return data
 
@@ -45,7 +57,7 @@ class Preprocessor(Stage):
         print("ANALYSING SENTIMENTS OF COMMENTS...")
 
         # dataset file name for storing or reading the data (depend on the scrapper config)
-        dataset_file_name = f'../dataset/comments_dataset_{self.get_attributes("crypto")}.csv'
+        dataset_file_name = f'../dataset/comments_{self.get_attributes("crypto")}.csv'
 
         # checking if we wanna load new comments or use older saved dataset
         comments_load = self.get_attributes("comments_load")
