@@ -64,6 +64,9 @@ class Builder(Stage):
                           y_label='Metric',
                           save_name=f"../results/graphs/metric_{self.model_name}")
 
+        print(f"Avarage of loss: {sum(results.history['loss']) / len(results.history['loss'])}")
+        print(f"Avarage of rmse: {sum(results.history['rmse']) / len(results.history['rmse'])}")
+
     """
     Verifying model
     """
