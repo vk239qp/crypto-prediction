@@ -86,6 +86,7 @@ class Builder(Stage):
 
         print("Predicted Prices:\n", prediction.tolist())
         print("Actual Prices:\n", actual.tolist())
+        print("Sum of differences between predictions: ", self.calculate_diff_sum(prediction, actual))
 
         self.plotter.plot(data=[prediction, actual],
                           legend=['Predicted', 'True'],
@@ -94,6 +95,18 @@ class Builder(Stage):
                           x_ticks=1.0,
                           y_label="Price",
                           save_name=f"../results/graphs/plot_{self.model_name}")
+
+    """
+    Calculating sum of differences between real and predicted prices
+    """
+
+    def calculate_diff_sum(self, prediction: list, real: list):
+        diff = 0
+
+        for index, real_price in enumerate(real):
+            diff += abs(real_price - prediction[index])
+
+        return diff
 
     """
     Saving trained model with weights.
