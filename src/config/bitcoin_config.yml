@@ -1,5 +1,11 @@
 network:
+<<<<<<< HEAD
   batch: 38
   epochs: 140
   log: 2
 #  validation: 0.1
+=======
+  batch: 64
+  epochs: 600
+  log: 2
+>>>>>>> master
