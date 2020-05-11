@@ -1,11 +1,6 @@
 scrapper:
-<<<<<<< HEAD
   load: false
   recent: 1000
-=======
-  recent: 500
->>>>>>> master
-
 cryptocompare:
   load: false
   url: https://min-api.cryptocompare.com/data/v2/histoday
