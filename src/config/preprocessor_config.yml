@@ -2,5 +2,9 @@ preprocessor:
   data:
     test_size: 0.2
   window:
+<<<<<<< HEAD
     past: 11
+=======
+    past: 7
+>>>>>>> master
     future: 5

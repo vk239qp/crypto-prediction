@@ -16,7 +16,7 @@ class Runner:
 
     def run(self):
         if len(self.crypto_currencies) < 1:
-            print("You doesnt defined any crypto currencies which you wanna train or test")
+            print("You did not define any crypto currencies which you wanna train or test")
             return
 
         for index, crypto in enumerate(self.crypto_currencies):
@@ -27,9 +27,7 @@ class Runner:
     def run_crypto_pipe(self, pipe: Pipeline, crypto: CryptoCurrency):
         if self.mode == 0:
             pipe.add(Preprocessor("preprocessor_config"))
-            pipe.add(
-                self.get_lstm_class(crypto.name)
-            )
+            pipe.add(self.get_lstm_class(crypto.name))
             pipe.process()
         elif self.mode == 1:
             pipe.add(Preprocessor("preprocessor_config"))

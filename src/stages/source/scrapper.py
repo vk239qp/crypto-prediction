@@ -15,8 +15,8 @@ class Scrapper(Stage):
 
         self.crypto = crypto
 
-        self.load = self.config["scrapper"]["load"]
         self.recent = self.config["scrapper"]["recent"]
+        self.price_load = self.config["cryptocompare"]["load"]
         self.prices_url = self.config["cryptocompare"]["url"]
         self.token = self.config["cryptocompare"]["token"]
         self.comments_load = self.config["pushshift"]["load"]
@@ -114,11 +114,15 @@ class Scrapper(Stage):
                     csv_writer.writerow(values)
 
     def run(self):
-        if self.load:
+        if self.price_load:
             self.convert_prices(self.fetch_prices())
+
+        if self.comments_load:
             self.convert_comments(self.fetch_comments())
 
     def test(self):
-        if self.load:
+        if self.price_load:
             self.convert_prices(self.fetch_prices())
+
+        if self.comments_load:
             self.convert_comments(self.fetch_comments())
