@@ -2,5 +2,5 @@ preprocessor:
   data:
     test_size: 0.2
   window:
-    past: 7
+    past: 11
     future: 5
