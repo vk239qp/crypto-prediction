@@ -12,7 +12,7 @@ class LSTMBitcoin(Builder):
 
     def build(self):
         random.seed(1337)
-        self.model.add(LSTM(38, input_shape=(self.get_attributes('past_steps'), self.get_attributes('features'))))
+        self.model.add(LSTM(37, input_shape=(self.get_attributes('past_steps'), self.get_attributes('features'))))
         self.model.add(Dense(self.get_attributes('future_steps')))
 
         self.model.compile(loss='mae', optimizer='adam',

@@ -1,5 +1,5 @@
 network:
-  batch: 56
+  batch: 38
   epochs: 140
   log: 2
 #  validation: 0.1
