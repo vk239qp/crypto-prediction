@@ -1,6 +1,6 @@
 import imp
 
-from src.helpers.CryptoCurrency import CryptoCurrency
+from src.helpers.crypto_currency import CryptoCurrency
 from src.stages.execution.tester import Tester
 from src.stages.operation.preprocessor import Preprocessor
 
