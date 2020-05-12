@@ -8,6 +8,11 @@ import numpy as np
 from src.pipeline.stage import Stage
 from src.stages.execution.plotter import Plotter
 
+"""
+Calculating the median
+first we calculate percentage deviations for every day, after that return the median
+"""
+
 
 def get_median_of_deviations(prediction, actual):
     if len(prediction) < 1 and len(actual) < 1:

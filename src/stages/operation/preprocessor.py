@@ -102,7 +102,7 @@ class Preprocessor(Stage):
 
     def merge_datasets(self):
         merged = pd.merge(self.load_comments(), self.load_prices(), how='inner', left_index=True, right_index=True)
-        print('merged')
+
         # splitting data to features and targets
         data_columns = list(merged.columns.values)
         data_columns.remove('close')
