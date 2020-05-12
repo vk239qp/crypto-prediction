@@ -18,6 +18,9 @@ class Preprocessor(Stage):
         self.past_steps = self.config["preprocessor"]["window"]["past"]
         self.future_steps = self.config["preprocessor"]["window"]["future"]
 
+        self.prices_feature = self.config["preprocessor"]["features"]["prices_features"]
+        self.use_comments = self.config["preprocessor"]["features"]["comments"]
+
     """
     Loading prices from csv.
     """
@@ -29,24 +32,24 @@ class Preprocessor(Stage):
 
         # checking if we wanna load new comments or use older saved dataset
         price_load = self.get_attributes("price_load")
-
         # using old dataset
         if not price_load:
             saved_dataset = pd.read_csv(dataset_file_name, index_col=0)
-
+            if not self.use_comments:
+                return self.prices_dataset(saved_dataset)
             return saved_dataset
 
-        # adding custom features
-        data['delta_day'] = data['high'] - data['low']
-        data['prices_mean'] = data[['open', 'close', 'high', 'low']].mean(axis=1)
-        data['pct_change'] = data['prices_mean'].pct_change()
+        # appending custom price features
+        data = self.append_price_features(data)
 
         # setting time as index and converting to UTC
         data = data.set_index('time')
         data.index = pd.to_datetime(data.index, unit='s')
 
+        # storing data
         data.to_csv(dataset_file_name)
-
+        if not self.use_comments:
+            return self.prices_dataset(data)
         return data
 
     """
@@ -65,7 +68,6 @@ class Preprocessor(Stage):
         # using old dataset
         if not comments_load:
             saved_dataset = pd.read_csv(dataset_file_name, index_col=0)
-
             return saved_dataset
 
         data = pd.read_csv(dataset_file_name).reset_index(drop=True)
@@ -116,7 +118,7 @@ class Preprocessor(Stage):
     """
 
     def prepare(self):
-        data_x, data_y = self.merge_datasets()
+        data_x, data_y = self.merge_datasets() if self.use_comments else self.load_prices()
 
         # getting rid of invalid values
         data_x = data_x.fillna(0)
@@ -155,6 +157,45 @@ class Preprocessor(Stage):
             window_y.append(normalized_y[prev_days:fut_days])
 
         return np.array(window_x), np.array(window_y)
+
+    """
+    Appending custom price features to data
+      
+    data - origin data
+    """
+
+    def append_price_features(self, data):
+        if self.prices_feature:
+            # adding custom features
+            data['delta_day'] = data['high'] - data['low']
+            data['prices_mean'] = data[['open', 'close', 'high', 'low']].mean(axis=1)
+            data['pct_change'] = data['prices_mean'].pct_change()
+
+        return data
+
+    """
+    Getting prepared dataset of prices
+    
+    data - origin data
+    """
+
+    def prices_dataset(self, data):
+        return self.split_data(self.append_price_features(data))
+
+    """
+    Splitting data to data_x and data_y
+
+    data - origin data
+    """
+
+    def split_data(self, data):
+        data_columns = list(data.columns.values)
+        data_columns.remove('close')
+        self.add_attribute('features', len(data_columns))
+
+        data_x = data[data_columns]
+        data_y = data['close']
+        return data_x, data_y
 
     """
     Splitting data to train and test sets.
