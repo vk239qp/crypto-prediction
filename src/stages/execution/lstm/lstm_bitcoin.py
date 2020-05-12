@@ -1,3 +1,9 @@
+import numpy
+import os
+import random
+import tensorflow as tf
+from tensorflow_core import metrics
+
 from keras.layers import LSTM, Dense
 
 from src.stages.execution.builder import Builder
@@ -9,12 +15,12 @@ class LSTMBitcoin(Builder):
         super().__init__(config_file)
 
     def build(self):
-        self.model.add(LSTM(120, input_shape=(self.get_attributes('past_steps'), self.get_attributes('features')),
-                            activation="relu", return_sequences=True))
-        self.model.add(LSTM(60, activation="relu", return_sequences=True))
-        self.model.add(LSTM(60, activation="relu", return_sequences=True))
-        self.model.add(LSTM(30, activation="relu"))
+        tf.random.set_seed(7)
+        numpy.random.seed(7)
+        os.environ['PYTHONHASHSEED'] = str(7)
+        random.seed(7)
+        self.model.add(LSTM(37, input_shape=(self.get_attributes('past_steps'), self.get_attributes('features'))))
         self.model.add(Dense(self.get_attributes('future_steps')))
 
-        self.model.compile(loss='mse', optimizer='adam', metrics=['accuracy'])
+        self.model.compile(loss='mse', optimizer='adam', metrics=[metrics.RootMeanSquaredError(name='rmse')])
         self.model.summary()

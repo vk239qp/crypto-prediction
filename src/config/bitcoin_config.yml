@@ -1,4 +1,4 @@
 network:
-  batch: 64
-  epochs: 600
+  batch: 62
+  epochs: 163
   log: 2
