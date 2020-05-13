@@ -224,7 +224,7 @@ class Preprocessor(Stage):
         self.add_attribute('test_y', test_y)
 
     def test(self):
-        data_x, data_y = self.merge_datasets()
+        data_x, data_y = self.merge_datasets() if self.use_comments else self.load_prices()
 
         data_x = data_x.fillna(0)
         data_y = data_y.fillna(0)

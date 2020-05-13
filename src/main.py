@@ -3,7 +3,7 @@ from src.helpers.runner import Runner
 
 if __name__ == '__main__':
     # 0 - train, 1 - test, 2 - comparing
-    mode = 0
+    mode = 1
 
     crypto_currencies_to_run = [
         CryptoCurrency("Bitcoin", "BTC")
