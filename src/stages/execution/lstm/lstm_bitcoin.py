@@ -22,7 +22,7 @@ class LSTMBitcoin(Builder):
         os.environ['PYTHONHASHSEED'] = str(7)
         random.seed(7)
         # 29, 37
-        self.model.add(LSTM(28, input_shape=(self.get_attributes('past_steps'), self.get_attributes('features'))))
+        self.model.add(LSTM(19, input_shape=(self.get_attributes('past_steps'), self.get_attributes('features'))))
         self.model.add(Dense(self.get_attributes('future_steps')))
         self.model.compile(loss='mae', optimizer='adam',
                            metrics=[metrics.RootMeanSquaredError(name='rmse')])
