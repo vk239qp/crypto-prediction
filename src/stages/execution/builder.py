@@ -1,4 +1,5 @@
 import os
+import statistics
 from abc import abstractmethod
 from datetime import datetime
 
@@ -6,6 +7,22 @@ from keras import Sequential
 import numpy as np
 from src.pipeline.stage import Stage
 from src.stages.execution.plotter import Plotter
+
+"""
+Calculating the median
+first we calculate percentage deviations for every day, after that return the median
+"""
+
+
+def get_median_of_deviations(prediction, actual):
+    if len(prediction) < 1 and len(actual) < 1:
+        return 0
+    diff = list()
+    for act, pred in zip(actual, prediction):
+        actual_price, pred_price = act[0], pred[0]
+        diff.append(((abs(actual_price - pred_price) / actual_price) * 100))
+
+    return statistics.median(diff)
 
 
 class Builder(Stage):
@@ -89,7 +106,7 @@ class Builder(Stage):
 
         print("Predicted Prices:\n", prediction.tolist())
         print("Actual Prices:\n", actual.tolist())
-        print("Sum of differences between predictions: ", self.calculate_diff_sum(prediction, actual))
+        print("Median of deviations:\n", get_median_of_deviations(prediction, actual))
 
         self.plotter.plot(data=[prediction, actual],
                           legend=['Predicted', 'True'],
@@ -98,18 +115,6 @@ class Builder(Stage):
                           x_ticks=1.0,
                           y_label="Price",
                           save_name=f"../results/graphs/plot_{self.model_name}")
-
-    """
-    Calculating sum of differences between real and predicted prices
-    """
-
-    def calculate_diff_sum(self, prediction: list, real: list):
-        diff = 0
-
-        for index, real_price in enumerate(real):
-            diff += abs(real_price - prediction[index])
-
-        return diff
 
     """
     Saving trained model with weights.

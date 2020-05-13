@@ -2,5 +2,8 @@ preprocessor:
   data:
     test_size: 0.2
   window:
-    past: 11
+    past: 20
     future: 5
+  features:
+    prices_features: false
+    comments: false
