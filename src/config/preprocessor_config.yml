@@ -2,7 +2,7 @@ preprocessor:
   data:
     test_size: 0.2
   window:
-    past: 20
+    past: 80
     future: 5
   features:
     prices_features: false
